@@ -1,4 +1,4 @@
-// Copyright 2022 Stereolabs
+// Copyright 22 Stereolabs
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <atomic>
 #include <sl/Camera.hpp>
 #include <sl/Fusion.hpp>
-#include <unordered_set>
 
+#include <unordered_set>
 #include "sl_tools.hpp"
 #include "sl_types.hpp"
 #include "visibility_control.hpp"
@@ -238,7 +238,7 @@ private:
   sl::InitParameters mInitParams;
   sl::RuntimeParameters mRunParams;
 
-  // ----> Fusion module
+  // // ----> Fusion module
   std::shared_ptr<sl::FusionConfiguration> mFusionConfig;
   sl::Fusion mFusion;
   sl::InitFusionParameters mFusionInitParams;
@@ -284,6 +284,7 @@ private:
   bool mDebugRoi = false;
   bool mDebugStreaming = false;
 
+  // simulation block
   int mCamSerialNumber = 0;
   bool mSimMode = false;     // Expecting simulation data?
   bool mUseSimTime = false;  // Use sim time?
@@ -295,6 +296,7 @@ private:
   std::string mStreamAddr = "";  // The local address of the streaming server
   int mStreamPort = 30000;  // The port to be used to connect to a local streaming server
 
+  // camera block
   sl::MODEL mCamUserModel = sl::MODEL::ZED;  // Default camera model
   sl::MODEL mCamRealModel;                   // Camera model requested to SDK
   unsigned int mCamFwVersion;                // Camera FW version
@@ -343,6 +345,7 @@ private:
   bool mPoseSmoothing = false;
   bool mAreaMemory = true;
   std::string mAreaMemoryDbPath = "";
+
   sl::POSITIONAL_TRACKING_MODE mPosTrkMode =
     sl::POSITIONAL_TRACKING_MODE::GEN_2;
   bool mImuFusion = true;
@@ -358,7 +361,7 @@ private:
   bool mSetGravityAsOrigin = false;
   int mPathMaxCount = -1;
   bool mPublishPoseCov = true;
-
+  // gnss block
   bool mGnssFusionEnabled = false;
   std::string mGnssTopic = "/gps/fix";
   bool mGnssEnableReinitialization = true;
@@ -377,6 +380,7 @@ private:
   float mMappingRes = 0.05f;
   float mMappingRangeMax = 10.0f;
 
+  // obj detection block 
   bool mObjDetEnabled = false;
   bool mObjDetTracking = true;
   float mObjDetConfidence = 40.0f;
@@ -396,6 +400,7 @@ private:
     sl::OBJECT_DETECTION_MODEL::MULTI_CLASS_BOX_FAST;
   sl::OBJECT_FILTERING_MODE mObjFilterMode = sl::OBJECT_FILTERING_MODE::NMS3D;
 
+  // body tracking block 
   bool mBodyTrkEnabled = false;
   sl::BODY_TRACKING_MODEL mBodyTrkModel =
     sl::BODY_TRACKING_MODEL::HUMAN_BODY_FAST;
@@ -430,7 +435,7 @@ private:
 
   // ----> Dynamic params
   OnSetParametersCallbackHandle::SharedPtr mParamChangeCallbackHandle;
-
+  // img quality block
   double mPubFrameRate = 15.0;
   int mCamBrightness = 4;
   int mCamContrast = 4;
@@ -516,8 +521,11 @@ private:
   sl::Transform mSlCamImuTransf;
 
   // ----> initialization Transform listener
+  // buffers that holds the tfs 
   std::unique_ptr<tf2_ros::Buffer> mTfBuffer;
+  // buffer got updated by the tf listener
   std::unique_ptr<tf2_ros::TransformListener> mTfListener;
+  // transform broadcaster which is used to push transforms to the /tf topic 
   std::unique_ptr<tf2_ros::TransformBroadcaster> mTfBroadcaster;
   // <---- initialization Transform listener
 
@@ -555,7 +563,8 @@ private:
 
   // ----> Messages (ONLY THOSE NOT CHANGING WHILE NODE RUNS)
   // Camera infos
-  camInfoMsgPtr mRgbCamInfoMsg;
+  // for each raw msg , correspoinding info msg is being used 
+  camInfoMsgPtr mRgbCamInfoMsg; // sensor_msgs/msg/CameraInfo
   camInfoMsgPtr mLeftCamInfoMsg;
   camInfoMsgPtr mRightCamInfoMsg;
   camInfoMsgPtr mRgbCamInfoRawMsg;
@@ -588,14 +597,14 @@ private:
   point_cloud_transport::Publisher mPubCloud;
   point_cloud_transport::Publisher mPubFusedCloud;
 #else
-  pointcloudPub mPubCloud;
-  pointcloudPub mPubFusedCloud;
+  pointcloudPub mPubCloud; // publisher to sensor_msgs/msg/PointCloud2
+  pointcloudPub mPubFusedCloud; // publisher to sensor_msgs/msg/PointCloud2
 #endif
 
-  imagePub mPubConfMap;
-  disparityPub mPubDisparity;
-  posePub mPubPose;
-  poseStatusPub mPubPoseStatus;
+  imagePub mPubConfMap; // publisher to sensor_msgs/msg/Image
+  disparityPub mPubDisparity;  // publisher to stereo_msgs/msg/DisparityImage
+  posePub mPubPose; // publisher to geometry_msgs/msg/PoseStamped
+  poseStatusPub mPubPoseStatus; //  
   poseCovPub mPubPoseCov;
   odomPub mPubOdom;
   odomPub mPubGnssPose;
@@ -776,7 +785,6 @@ private:
   bool mBaroPublishing = false;
   bool mObjDetSubscribed = false;
   bool mBodyTrkSubscribed = false;
-
   diagnostic_updater::Updater mDiagUpdater;  // Diagnostic Updater
 
   sl_tools::StopWatch mImuTfFreqTimer;

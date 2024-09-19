@@ -66,11 +66,11 @@ const sl::UNIT ROS_MEAS_UNITS = sl::UNIT::METER;
 
 const int QOS_QUEUE_SIZE = 10;
 // <---- Global constants
-
+ // constructor of the zed camera component 
 ZedCamera::ZedCamera(const rclcpp::NodeOptions & options)
 : Node("zed_node", options),
   mQos(QOS_QUEUE_SIZE),
-  mAiInstanceID(0),
+  mAiInstanceID(0), // atomic_uint16_t
   mDiagUpdater(this),
   mImuTfFreqTimer(get_clock()),
   mGrabFreqTimer(get_clock()),
@@ -559,9 +559,9 @@ void ZedCamera::getDebugParams()
   rclcpp::Parameter paramVal;
 
   RCLCPP_INFO(get_logger(), "*** DEBUG parameters ***");
-
+  //        parameter name      // 1        1         loginfo  
   getParam("debug.sdk_verbose", mVerbose, mVerbose, " * SDK Verbose: ");
-
+  //        parameter name        // false        // false
   getParam("debug.debug_common", mDebugCommon, mDebugCommon);
   RCLCPP_INFO(
     get_logger(), " * Debug Common: %s",

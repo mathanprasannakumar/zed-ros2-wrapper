@@ -64,7 +64,6 @@
 #ifndef FOUND_FOXY
   #include <point_cloud_transport/point_cloud_transport.hpp>
 #endif
-
 #define TIMEZERO_ROS rclcpp::Time(0, 0, RCL_ROS_TIME)
 #define TIMEZERO_SYS rclcpp::Time(0, 0, RCL_SYSTEM_TIME)
 
